@@ -87,11 +87,6 @@ def limpiar_tablero():
     jugador = True
 
 
-# Init of program
-def init():
-    limpiar_tablero()
-
-
 # Probar los Leds Azules
 def prueba_leds1(a, b):
     led_pinsR1[a].high()
@@ -286,91 +281,102 @@ def jugada_repetida(r, c):
     led_pinsC3[c].high()
 
 
+# Init of program
+def init():
+    limpiar_tablero()
+
+
+# Funcion Principal
+def loop():
+    while True:
+        for row in range(4):
+            for col in range(4):
+                key = scan(row, col)
+                if key == KEY_DOWN:
+                    print("Key Pressed: ", keys[row][col])
+                    # Leds Azules
+                    if len(Tablero1) % 2 == 0:
+                        if (
+                            keys[row][col] != "A"
+                            and keys[row][col] != "B"
+                            and keys[row][col] != "C"
+                            and keys[row][col] != "D"
+                            and keys[row][col] != "#"
+                            and keys[row][col] != "0"
+                            and keys[row][col] != "*"
+                        ):
+                            probar_valor1(row, col)
+                            a = row
+                            b = col
+                        if len(filas_prueba1) > 0 and keys[row][col] == "0":
+                            guardar_valor1(a, b)
+                            Tablero1.add(keys[a][b])
+                            time.sleep(1.5)
+                    # Leds Rojos
+                    else:
+                        if (
+                            keys[row][col] != "A"
+                            and keys[row][col] != "B"
+                            and keys[row][col] != "C"
+                            and keys[row][col] != "D"
+                            and keys[row][col] != "#"
+                            and keys[row][col] != "0"
+                            and keys[row][col] != "*"
+                        ):
+                            probar_valor2(row, col)
+                            a = row
+                            b = col
+                        if len(filas_prueba2) > 0 and keys[row][col] == "0":
+                            guardar_valor2(a, b)
+                            Tablero1.add(keys[a][b])
+                            time.sleep(1.5)
+                    # Reiniciar partida
+                    if keys[row][col] == "*":
+                        limpiar_tablero()
+
+        # Probar el LED Azul
+        if len(filas_prueba1) > 0:
+            f = filas_prueba1.pop()
+            c = cols_prueba1.pop()
+            filas_prueba1.append(f)
+            cols_prueba1.append(c)
+            prueba_leds1(f, c)
+
+        # Probar el LED Rojo
+        if len(filas_prueba2) > 0:
+            f = filas_prueba2.pop()
+            c = cols_prueba2.pop()
+            filas_prueba2.append(f)
+            cols_prueba2.append(c)
+            prueba_leds2(f, c)
+
+        # Prender el LED Azul
+        if len(filas_alternas1) > 0:
+            prender_leds1()
+
+        # Prender el LED Rojo
+        if len(filas_alternas2) > 0:
+            prender_leds2()
+
+        # Comprobar jugada repetida
+        if len(Board1 & Board2) != 0:
+            if len(Tablero1) % 2 == 0:
+                Board1 = Board1 - Board2
+                r = filas_alternas1.pop()
+                c = cols_alternas1.pop()
+                jugada_repetida(r, c)
+
+            else:
+                Board2 = Board2 - Board1
+                r = filas_alternas2.pop()
+                c = cols_alternas2.pop()
+                jugada_repetida(r, c)
+
+        # Determinar si hubo ganador
+        comprobar_ganador()
+
+
 # Inicio del programa
-init()
-while True:
-    for row in range(4):
-        for col in range(4):
-            key = scan(row, col)
-            if key == KEY_DOWN:
-                print("Key Pressed: ", keys[row][col])
-                # Leds Azules
-                if len(Tablero1) % 2 == 0:
-                    if (
-                        keys[row][col] != "A"
-                        and keys[row][col] != "B"
-                        and keys[row][col] != "C"
-                        and keys[row][col] != "D"
-                        and keys[row][col] != "#"
-                        and keys[row][col] != "0"
-                        and keys[row][col] != "*"
-                    ):
-                        probar_valor1(row, col)
-                        a = row
-                        b = col
-                    if len(filas_prueba1) > 0 and keys[row][col] == "0":
-                        guardar_valor1(a, b)
-                        Tablero1.add(keys[a][b])
-                        time.sleep(1.5)
-                # Leds Rojos
-                else:
-                    if (
-                        keys[row][col] != "A"
-                        and keys[row][col] != "B"
-                        and keys[row][col] != "C"
-                        and keys[row][col] != "D"
-                        and keys[row][col] != "#"
-                        and keys[row][col] != "0"
-                        and keys[row][col] != "*"
-                    ):
-                        probar_valor2(row, col)
-                        a = row
-                        b = col
-                    if len(filas_prueba2) > 0 and keys[row][col] == "0":
-                        guardar_valor2(a, b)
-                        Tablero1.add(keys[a][b])
-                        time.sleep(1.5)
-                # Reiniciar partida
-                if keys[row][col] == "*":
-                    limpiar_tablero()
-
-    # Probar el LED Azul
-    if len(filas_prueba1) > 0:
-        f = filas_prueba1.pop()
-        c = cols_prueba1.pop()
-        filas_prueba1.append(f)
-        cols_prueba1.append(c)
-        prueba_leds1(f, c)
-
-    # Probar el LED Rojo
-    if len(filas_prueba2) > 0:
-        f = filas_prueba2.pop()
-        c = cols_prueba2.pop()
-        filas_prueba2.append(f)
-        cols_prueba2.append(c)
-        prueba_leds2(f, c)
-
-    # Prender el LED Azul
-    if len(filas_alternas1) > 0:
-        prender_leds1()
-
-    # Prender el LED Rojo
-    if len(filas_alternas2) > 0:
-        prender_leds2()
-
-    # Comprobar jugada repetida
-    if len(Board1 & Board2) != 0:
-        if len(Tablero1) % 2 == 0:
-            Board1 = Board1 - Board2
-            r = filas_alternas1.pop()
-            c = cols_alternas1.pop()
-            jugada_repetida(r, c)
-
-        else:
-            Board2 = Board2 - Board1
-            r = filas_alternas2.pop()
-            c = cols_alternas2.pop()
-            jugada_repetida(r, c)
-
-    # Determinar si hubo ganador
-    comprobar_ganador()
+if __name__ == "__main__":
+    init()
+    loop()
